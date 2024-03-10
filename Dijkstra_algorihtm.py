@@ -2,6 +2,7 @@ import numpy as np
 import math
 import heapq
 import cv2
+import time
 
 map_width = 1200
 map_height = 500
@@ -118,16 +119,17 @@ def up_right(x, y, cost):
 ######### IMPLEMENTING DIJKSTRA ALGORITHM ##############
 
 def dijkstra(start, goal, obs_space):
+    start_time = time.time()  # Start time for measuring time taken
     if not Validity(start.x, start.y, obs_space):
         print("Invalid start node")
-        return None, 0
+        return None, 0, 0
 
     if not Validity(goal.x, goal.y, obs_space):
         print("Invalid goal node")
-        return None, 0
+        return None, 0, 0
 
     if Check_goal(start, goal):
-        return None, 1
+        return None, 1, 0
 
     goal_node = goal
     start_node = start
@@ -156,7 +158,9 @@ def dijkstra(start, goal, obs_space):
             goal_node.parent_id = present_node.parent_id
             goal_node.cost = present_node.cost
             print("Goal Node found")
-            return all_nodes, 1
+            end_time = time.time()  # End time for measuring time taken
+            time_taken = end_time - start_time  # Calculate time taken
+            return all_nodes, 1, time_taken
 
         if present_id in explored_nodes:
             continue
@@ -185,7 +189,7 @@ def dijkstra(start, goal, obs_space):
 
             heapq.heappush(priority_list, [new_node.cost, new_node])
 
-    return all_nodes, 0
+    return all_nodes, 0, 0
 
 ########### BACKTRACK AND GENERATE SHORTEST PATH ############
 
@@ -194,6 +198,7 @@ def Backtrack(goal_node):
     y_path = []
     x_path.append(goal_node.x)
     y_path.append(goal_node.y)
+    total_cost = goal_node.cost  # Initialize total cost
 
     parent_node = goal_node.parent_id
     while parent_node != -1:
@@ -204,7 +209,7 @@ def Backtrack(goal_node):
     x_path.reverse()
     y_path.reverse()
 
-    return x_path, y_path
+    return x_path, y_path, total_cost  # Return total cost along with path coordinates
 
 ######### CALLING ALL MY FUNCTIONS TO IMPLEMENT DIJKSTRA ALGORITHM ON A POINT ROBOT ###########
 
@@ -223,14 +228,14 @@ if __name__ == '__main__':
         except ValueError:
             print("Invalid input format. Please enter two integers separated by space.")
 
-    # Taking end node coordinates as input from user
+    # Taking Goal Node coordinates as input from user
     while True:
         while True:
-            end_coordinates = input("Enter coordinates for End Node (x y): ")
+            end_coordinates = input("Enter coordinates for Goal Node (x y): ")
             try:
                 e_x, e_y = map(int, end_coordinates.split())
                 if not Validity(e_x, e_y, obs_space) or image[e_y][e_x].tolist() == OBS_COLOR or image[e_y][e_x].tolist() == PADDING_COLOR:
-                    print("End node is within an obstacle or outside the map boundaries. Please enter valid coordinates.")
+                    print("Goal Node is within an obstacle or outside the map boundaries. Please enter valid coordinates.")
                     continue
                 break
             except ValueError:
@@ -242,14 +247,16 @@ if __name__ == '__main__':
     goal_node = Node(e_x, map_height - e_y, 0, -1)  # You can adjust the goal node coordinates as needed
 
     # Run Dijkstra algorithm
-    all_nodes, found_goal = dijkstra(start_node, goal_node, obs_space)
+    all_nodes, found_goal, time_taken = dijkstra(start_node, goal_node, obs_space)
 
     if found_goal:
         # Generate shortest path
-        x_path, y_path = Backtrack(goal_node)
+        x_path, y_path, total_cost = Backtrack(goal_node)
         print("Shortest Path: ", x_path, y_path)
+        print("Total Cost:", total_cost)
+        print("Time taken to find the goal node:", time_taken, "seconds")
     else:
-        print("Goal not found or start/goal nodes are invalid.")
+        print("Goal not found.")
 
     # Visualize the map and path
     image_with_path = np.copy(image)
@@ -265,7 +272,7 @@ if __name__ == '__main__':
 
         # Draw start and end points
         cv2.circle(image_with_path, (s_x,map_height- s_y), 5, (0, 255, 0), -1)  # Green circle for start point
-        cv2.circle(image_with_path, (e_x,map_height- e_y), 5, (0, 0, 255), -1)  # Red circl5 5e for end point
+        cv2.circle(image_with_path, (e_x,map_height- e_y), 5, (0, 0, 255), -1)  # Red circle for end point
 
         cv2.imshow("Map with Path", image_with_path)
         cv2.waitKey(0)
