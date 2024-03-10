@@ -66,7 +66,7 @@ def Configuration_space(image):
     obs_space = np.zeros((map_height, map_width), dtype=np.uint8)
     for y in range(map_height):
         for x in range(map_width):
-            if np.all(image[y, x] == PADDING_COLOR) or x == 0 or x == map_width - 1 or y == 0 or y == map_height - 1:
+            if np.all(image[y, x] == PADDING_COLOR) or np.all(image[y, x] == OBS_COLOR) or x == 0 or x == map_width - 1 or y == 0 or y == map_height - 1:
                 obs_space[y, x] = 255
     return obs_space
 
