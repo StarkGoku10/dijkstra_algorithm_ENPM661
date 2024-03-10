@@ -15,7 +15,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BORDER_COLOR = (6, 3, 141)  # Change border color
 GRAY = (200, 200, 200)
-GREEN = (255, 103, 31)
+ORANGE = (255, 103, 31)
 # Define padding
 padding = 5
 
@@ -78,17 +78,17 @@ while running:
     pygame.draw.rect(screen, BORDER_COLOR, border_rectangle5)
 
     # Draw rectangles
-    pygame.draw.rect(screen, GREEN, rectangle1)
-    pygame.draw.rect(screen, GREEN, rectangle2)
-    pygame.draw.rect(screen, GREEN, rectangle3)
-    pygame.draw.rect(screen, GREEN, rectangle4)
-    pygame.draw.rect(screen, GREEN, rectangle5)
+    pygame.draw.rect(screen, ORANGE, rectangle1)
+    pygame.draw.rect(screen, ORANGE, rectangle2)
+    pygame.draw.rect(screen, ORANGE, rectangle3)
+    pygame.draw.rect(screen, ORANGE, rectangle4)
+    pygame.draw.rect(screen, ORANGE, rectangle5)
 
     # Draw hexagon border
     pygame.draw.polygon(screen, BORDER_COLOR, hexagon_border_vertices)
 
     # Draw hexagon
-    pygame.draw.polygon(screen, GREEN, hexagon_vertices)
+    pygame.draw.polygon(screen, ORANGE, hexagon_vertices)
     
     # Update the display
     pygame.display.flip()
