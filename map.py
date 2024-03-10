@@ -1,100 +1,54 @@
-import pygame
-import sys
-import math 
+import cv2
+import numpy as np
 
-# Initialize Pygame
-pygame.init()
 
-# Set up the screen
-width1, height1 = 1200, 500
-screen = pygame.display.set_mode((width1, height1))
-pygame.display.set_caption("Draw Rectangles")
+map_width = 500
+map_height = 1200
 
-# Set up colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BORDER_COLOR = (6, 3, 141)  # Change border color
-GRAY = (200, 200, 200)
-ORANGE = (255, 103, 31)
-# Define padding
+ORANGE = (141, 3, 6)
+# Create a blank white image
+image = np.ones((map_width, map_height, 3), dtype=np.uint8) * 255
+
+# Draw black border around the map
+border_thickness = 5
+cv2.rectangle(image, (0, 0), (map_height - 1, map_width - 1), (141, 3, 6), border_thickness)
+
+polygon_sides = 6
+polygon_length = 150
+polygon_bloat = 5
+PADDING_COLOR = (31,103,255)
 padding = 5
 
-# Processing
-# Original figures without border
-big_rectangle = pygame.Rect(5, 5, 1190, 490)
-rectangle1 = pygame.Rect(100, 0, 75, 400)
-rectangle2 = pygame.Rect(275, 100, 75, 400)
+# Draw rectangles
+cv2.rectangle(image, (100 - padding, -50 - padding), (175 + padding, 350 + padding), ORANGE, -1)
+cv2.rectangle(image, (275 - padding, 100 - padding), (350 + padding, 500 + padding), ORANGE, -1)
 
-# inverted c shaped figure
-rectangle3 = pygame.Rect(1020, 50, 80, 400)
-rectangle4 = pygame.Rect(900, 50, 200, 75)
-rectangle5 = pygame.Rect(900, 375, 200, 75)
+cv2.rectangle(image, (100, -50), (175, 350), PADDING_COLOR, -1)
+cv2.rectangle(image, (275, 100), (350, 500), PADDING_COLOR, -1)
 
-# Create rectangles for border
-border_rectangle1 = pygame.Rect(rectangle1.left - padding, rectangle1.top - padding, rectangle1.width + 2 * padding, rectangle1.height + 2 * padding)
-border_rectangle2 = pygame.Rect(rectangle2.left - padding, rectangle2.top - padding, rectangle2.width + 2 * padding, rectangle2.height + 2 * padding)
-border_rectangle3 = pygame.Rect(rectangle3.left - padding, rectangle3.top - padding, rectangle3.width + 2 * padding, rectangle3.height + 2 * padding)
-border_rectangle4 = pygame.Rect(rectangle4.left - padding, rectangle4.top - padding, rectangle4.width + 2 * padding, rectangle4.height + 2 * padding)
-border_rectangle5 = pygame.Rect(rectangle5.left - padding, rectangle5.top - padding, rectangle5.width + 2 * padding, rectangle5.height + 2 * padding)
+# Calculate the vertices of the polygon
+polygon_vertices = []
+for i in range(polygon_sides):
+    angle = np.radians(i * (360 / polygon_sides) + 90)
+    x = 650 + ((polygon_length + polygon_bloat) - padding) * np.cos(angle)
+    y = 250 + ((polygon_length + polygon_bloat) - padding) * np.sin(angle)
+    polygon_vertices.append((int(x), int(y)))
 
+# Draw the polygon
+cv2.fillPoly(image, [np.array(polygon_vertices)], PADDING_COLOR)
+cv2.polylines(image, [np.array(polygon_vertices)], isClosed=True, color=ORANGE, thickness=5)
 
-# Calculate hexagon vertices
-x_center, y_center = 650, 250
-vertex_length = 150
-hexagon_vertices = []
-for i in range(6):
-    angle_rad = math.radians(60 * i-90)
-    x = x_center + vertex_length * math.cos(angle_rad)
-    y = y_center + vertex_length * math.sin(angle_rad)
-    hexagon_vertices.append((x,y))
+# Draw U-shaped rectangle
+cv2.rectangle(image, (1020 - padding, 50 - padding), (1100 + padding, 450 + padding), ORANGE, -1)  # Right vertical part of U
+cv2.rectangle(image, (900 - padding, 50 - padding), (1100 + padding, 125 + padding), ORANGE, -1)  # Top vertical part of U
+cv2.rectangle(image, (900 - padding, 375 - padding), (1100 + padding, 450 + padding), ORANGE, -1)  # Bottom Horizontal part of U
 
-# Create hexagon border vertices
-hexagon_border_vertices = []
-for i in range(6):
-    angle_rad = math.radians(60 * i-90)
-    x = x_center + (vertex_length + padding) * math.cos(angle_rad)  # Add padding to the radius
-    y = y_center + (vertex_length + padding) * math.sin(angle_rad)
-    hexagon_border_vertices.append((x, y))
+# Draw padding for U-shaped rectangle
+cv2.rectangle(image, (1020, 50), (1100, 450), PADDING_COLOR, -1)  # Right vertical part of U without padding
+cv2.rectangle(image, (900, 50), (1100, 125), PADDING_COLOR, -1 )  # Top vertical part of U without padding
+cv2.rectangle(image, (900, 375), (1100, 450), PADDING_COLOR, -1)  # Bottom Horizontal part of U without padding
 
-
-# Main game loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    # Fill the background with white
-    screen.fill(BORDER_COLOR)
-
-    # Draw big background rectangle
-    pygame.draw.rect(screen, WHITE, big_rectangle)
-
-    # Draw border rectangles
-    pygame.draw.rect(screen, BORDER_COLOR, border_rectangle1)
-    pygame.draw.rect(screen, BORDER_COLOR, border_rectangle2)
-    pygame.draw.rect(screen, BORDER_COLOR, border_rectangle3)
-    pygame.draw.rect(screen, BORDER_COLOR, border_rectangle4)
-    pygame.draw.rect(screen, BORDER_COLOR, border_rectangle5)
-
-    # Draw rectangles
-    pygame.draw.rect(screen, ORANGE, rectangle1)
-    pygame.draw.rect(screen, ORANGE, rectangle2)
-    pygame.draw.rect(screen, ORANGE, rectangle3)
-    pygame.draw.rect(screen, ORANGE, rectangle4)
-    pygame.draw.rect(screen, ORANGE, rectangle5)
-
-    # Draw hexagon border
-    pygame.draw.polygon(screen, BORDER_COLOR, hexagon_border_vertices)
-
-    # Draw hexagon
-    pygame.draw.polygon(screen, ORANGE, hexagon_vertices)
-    
-    # Update the display
-    pygame.display.flip()
-
-# Quit Pygame
-pygame.quit()
-sys.exit()
-
-
+# Display the image
+cv2.imshow("Image", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
