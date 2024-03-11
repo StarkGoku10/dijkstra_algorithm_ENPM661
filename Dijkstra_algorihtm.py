@@ -2,8 +2,6 @@
 ########### https://github.com/StarkGoku10/dijkstra_algorithm_ENPM661.git ###########################
 #####################################################################################################
 
-
-
 import numpy as np
 import math
 import cv2
@@ -225,7 +223,15 @@ def Backtrack(goal_node):
     return x_path, y_path, total_cost  # Return total cost along with path coordinates
 
 
-# calling all the functions to implement dijkstra algorithm
+# Define video properties
+output_video_path = "Dijkstra_path_planning_video.mp4"
+fps = 60
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+video_out = cv2.VideoWriter(output_video_path, fourcc, fps, (map_width, map_height))
+
+# Frame counter
+frame_counter = 0
+frame_interval = 200  # Write every 200th frame
 
 if __name__ == '__main__':
     obs_space = Configuration_space(image)
@@ -274,18 +280,40 @@ if __name__ == '__main__':
     image_with_path = np.copy(image)
 
     if found_goal:
-        # Draw explored nodes
-        for node in all_nodes:
-            cv2.circle(image_with_path, (node[0], node[1]), 1, (0, 255, 255), -1)  # Yellow circle for explored nodes
+        for idx, node in enumerate(all_nodes):
+            cv2.circle(image_with_path, (node[0], node[1]), 1, (0, 255, 255), -1)
+            frame_counter += 1
+
+            if frame_counter == frame_interval:
+                # Write the frame to video
+                video_out.write(image_with_path)
+                frame_counter = 0
+
+            # Display the frame
+            cv2.imshow("Map with Path", image_with_path)
+            cv2.waitKey(1)
 
         # Draw shortest path
         for i in range(len(x_path) - 1):
             cv2.line(image_with_path, (x_path[i], y_path[i]), (x_path[i + 1], y_path[i + 1]), (0, 255, 0), 2)
+            video_out.write(image_with_path)
+
+            # Display the frame
+            cv2.imshow("Map with Path", image_with_path)
+            cv2.waitKey(1)
 
         # Draw start and end points
-        cv2.circle(image_with_path, (s_x,map_height- s_y), 5, (0, 255, 0), -1)  # Green circle for start point
-        cv2.circle(image_with_path, (e_x,map_height- e_y), 5, (0, 0, 255), -1)  # Red circle for end point
+        cv2.circle(image_with_path, (s_x,map_height- s_y), 5, (0, 255, 0), -1)
+        cv2.circle(image_with_path, (e_x,map_height- e_y), 5, (0, 0, 255), -1)
 
+        # Write the frame to video
+        video_out.write(image_with_path)
+
+        # Display the frame
         cv2.imshow("Map with Path", image_with_path)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        cv2.waitKey(1)
+
+    video_out.release()
+    cv2.destroyAllWindows()
+
+# In this code I want to animate the node exploration and path plotting in pygame and save that video
