@@ -2,6 +2,7 @@
 ########### https://github.com/StarkGoku10/dijkstra_algorithm_ENPM661.git ###########################
 #####################################################################################################
 
+
 import numpy as np
 import math
 import cv2
@@ -315,5 +316,3 @@ if __name__ == '__main__':
 
     video_out.release()
     cv2.destroyAllWindows()
-
-# In this code I want to animate the node exploration and path plotting in pygame and save that video

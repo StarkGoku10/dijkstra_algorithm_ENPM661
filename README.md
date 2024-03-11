@@ -12,6 +12,11 @@ To run the code:
 3. Run the code on your local machine.
 
 4. Test case used for running the code:
+        
+        Coordinates for animation:
+        Start node: 60 430
+        goal node: 1150 300
+
 
         Start node: 5, 5
         goal node: 1150, 490 
